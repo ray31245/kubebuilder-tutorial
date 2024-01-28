@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -31,6 +32,17 @@ import (
 type CronJobReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	Clock
+}
+
+type realClock struct{}
+
+func (_ realClock) Now() time.Time { return time.Now() }
+
+// clock knows how to get the current time.
+// It can be used to fake out timing for testing.
+type Clock interface {
+	Now() time.Time
 }
 
 //+kubebuilder:rbac:groups=batch.tutorial.kubebuilder.io,resources=cronjobs,verbs=get;list;watch;create;update;patch;delete
